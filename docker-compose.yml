@@ -1,0 +1,48 @@
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: web_cer
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    user: "1000:1000"
+    networks:
+      - app_network
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress_cer
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: wp_db
+    volumes:
+      - ./data/wordpress:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_cer
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wp_db
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

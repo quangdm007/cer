@@ -1,0 +1,32 @@
+.footer {
+    padding: 1.5em 0;
+    background-color: #0366C1;
+
+    .content {
+        .title {
+            font-size: 1em;
+            color: $color-white;
+            font-weight: 500;
+            text-transform: uppercase;
+            padding-bottom: 1.5em;
+        }
+
+        .menu-address {
+            ul li {
+                color: $color-white;
+                line-height: 1.8em;
+
+                a {
+                    color: $color-hover;
+                }
+            }
+        }
+
+        .aum-logo {
+            img {
+                width: 130px;
+                height: auto;
+            }
+        }
+    }
+}

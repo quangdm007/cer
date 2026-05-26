@@ -1,0 +1,135 @@
+.banner-majors {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+
+    .content {
+        padding: 80px 0;
+
+        h2 {
+            font-size: 44px;
+            color: $color-white;
+        }
+    }
+}
+
+.majors-tnu {
+    padding: 2em 0;
+    background-color: #eeeeee;
+
+    .content {
+        position: relative;
+
+        .line {
+            position: absolute;
+            width: 3px;
+            height: 100%;
+            background-color: $color-hover;
+            left: 50%;
+
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translate(-50%, 0);
+                width: 20px;
+                height: 20px;
+                background-color: $color-hover;
+                border-radius: 50%;
+            }
+        }
+
+        .box-one {
+            padding-top: 1em;
+
+        }
+
+        .box-one,
+        .box-two,
+        .box-three {
+            .wrapper-box {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
+                grid-gap: 1.5em;
+            }
+
+            .title {
+                h2 {
+                    text-align: left;
+                    font-size: 30px;
+                    font-weight: 700;
+                    line-height: 2em;
+                    color: $color-main-two;
+                }
+            }
+
+            .desc {
+                background-color: $color-white;
+                padding: 1em;
+                left: 1;
+
+                h4 {
+                    line-height: 2em;
+                    font-size: 1.2em;
+                }
+
+                ul li {
+                    line-height: 1.7em;
+                    list-style: disc;
+                    margin-left: 2em;
+                }
+
+                p {
+                    line-height: 2em;
+                }
+
+                span {
+                    padding: 0.5em;
+                    list-style: 1.7em;
+                }
+            }
+
+            .img {
+
+                left: 1;
+                padding-bottom: 1em;
+
+                img {
+                    border-radius: 1em;
+                    width: 100%;
+                }
+            }
+        }
+
+        .box-two {
+            padding: 1em 0;
+
+            .form {
+                flex: 1;
+
+                padding-top: 2em;
+                text-align: center;
+
+                #tnu-form {
+                    margin: 0 auto;
+                    max-width: 390px;
+                    width: 380px;
+                    padding: 1em;
+                    background-color: $color-main;
+                    border-radius: 1em;
+                }
+            }
+
+            .desc {
+                flex: 1;
+
+                span {
+                    padding: 0.5em;
+                    line-height: 1.7em;
+                }
+            }
+        }
+    }
+}
