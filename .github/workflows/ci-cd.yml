@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ─────────────────────────────────────────────────────
+  # JOB 1: CI — chạy trên GitHub-hosted runner (miễn phí)
+  # Lint + Type check + Build test TRƯỚC khi deploy
+  # ─────────────────────────────────────────────────────
+  ci:
+    name: ������ Lint & Type Check & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: TypeScript type check
+        run: npx tsc --noEmit
+
+      - name: Build Next.js (smoke test)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+  # ─────────────────────────────────────────────────────
+  # JOB 2: CD — chạy trên self-hosted runner (server LAN)
+  # Chỉ chạy khi merge vào main và CI pass
+  # Runner ở ngay trên server nên không cần SSH ra ngoài
+  # ─────────────────────────────────────────────────────
+  cd:
+    name: ������ Build Docker & Deploy (self-hosted)
+    runs-on: self-hosted          # ← chạy trực tiếp trên server 10.10.142.41
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── Build Docker image TRỰC TIẾP trên server ──
+      # Không cần push lên GHCR, build tại chỗ luôn (nhanh hơn, không cần internet)
+      - name: Build Docker image
+        run: |
+          docker build \
+            --tag aum_web:latest \
+            --tag aum_web:${{ github.sha }} \
+            --file Dockerfile \
+            .
+
+      # ── Deploy: restart container với image mới ──
+      - name: Deploy with docker compose
+        working-directory: /opt/aum_web/web.cer
+        run: |
+          # Pull code mới nhất đã được checkout ở bước trên
+          docker compose up -d --remove-orphans
+
+          # Chờ container healthy
+          sleep 5
+          docker compose ps
+
+      # ── Dọn image cũ ──
+      - name: Clean up old images
+        run: docker image prune -f
+
+      - name: Notify deploy success
+        run: |
+          echo "✅ Deploy thành công!"
+          echo "   Commit : ${{ github.sha }}"
+          echo "   Branch : ${{ github.ref_name }}"
+          echo "   Thời gian: $(date '+%Y-%m-%d %H:%M:%S')"
